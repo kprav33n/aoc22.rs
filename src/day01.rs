@@ -7,7 +7,7 @@ pub fn max_total_calories(s: &str) -> i64 {
         .map(|elf| {
             elf.trim()
                 .split('\n')
-                .map(|item| item.trim().parse::<i64>().unwrap())
+                .filter_map(|item| item.trim().parse::<i64>().ok())
                 .sum()
         })
         .max()
@@ -22,11 +22,11 @@ pub fn max3_total_calories(s: &str) -> i64 {
         .map(|elf| {
             elf.trim()
                 .split('\n')
-                .map(|item| item.trim().parse::<i64>().unwrap())
+                .filter_map(|item| item.trim().parse::<i64>().ok())
                 .sum()
         })
         .collect();
-    (0..3).map(|_| cals.pop()).flatten().sum()
+    (0..3).filter_map(|_| cals.pop()).sum()
 }
 
 #[cfg(test)]
