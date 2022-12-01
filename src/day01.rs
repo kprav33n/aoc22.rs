@@ -1,3 +1,5 @@
+use std::collections::BinaryHeap;
+
 /// Find the maximum total calories carried by any elf.
 pub fn max_total_calories(s: &str) -> i64 {
     s.trim()
@@ -14,7 +16,7 @@ pub fn max_total_calories(s: &str) -> i64 {
 
 /// Find the maximum total calories carried by any elf.
 pub fn max3_total_calories(s: &str) -> i64 {
-    let mut cals: Vec<i64> = s
+    let mut cals: BinaryHeap<i64> = s
         .trim()
         .split("\n\n")
         .map(|elf| {
@@ -23,9 +25,8 @@ pub fn max3_total_calories(s: &str) -> i64 {
                 .map(|item| item.trim().parse::<i64>().unwrap())
                 .sum()
         })
-        .collect::<Vec<_>>();
-    cals.sort_by(|a, b| b.cmp(a));
-    cals.iter().take(3).sum()
+        .collect();
+    (0..3).map(|_| cals.pop()).flatten().sum()
 }
 
 #[cfg(test)]
