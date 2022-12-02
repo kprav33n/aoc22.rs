@@ -25,6 +25,23 @@ impl FromStr for Hand {
     }
 }
 
+impl Hand {
+    // Return the bonus score for this hand.
+    fn bonus(&self) -> i64 {
+        match &self {
+            Hand::Rock => 1,
+            Hand::Paper => 2,
+            Hand::Scissors => 3,
+        }
+    }
+
+    // Return the score for this Hand played against the given Hand.
+    fn score_against(self, h: Hand) -> i64 {
+        let outcome = Outcome::from(h, self);
+        outcome.score() + self.bonus()
+    }
+}
+
 #[derive(Debug, Eq, PartialEq)]
 enum Outcome {
     Win,
@@ -47,7 +64,8 @@ impl FromStr for Outcome {
 }
 
 impl Outcome {
-    fn from(h1: &Hand, h2: &Hand) -> Outcome {
+    // Create the Outcome of two Hands.
+    fn from(h1: Hand, h2: Hand) -> Outcome {
         match (h1, h2) {
             (Hand::Scissors, Hand::Rock)
             | (Hand::Paper, Hand::Scissors)
@@ -57,6 +75,7 @@ impl Outcome {
         }
     }
 
+    // Return the score for this outcome.
     fn score(&self) -> i64 {
         match &self {
             Outcome::Win => 6,
@@ -65,18 +84,9 @@ impl Outcome {
         }
     }
 
-    fn hand_score(h1: &Hand, h2: &Hand) -> i64 {
-        let outcome = Outcome::from(h1, h2);
-        outcome.score()
-            + match h2 {
-                Hand::Rock => 1,
-                Hand::Paper => 2,
-                Hand::Scissors => 3,
-            }
-    }
-
-    fn hand_response(h: Hand, o: &Outcome) -> Hand {
-        match (h, o) {
+    // Return a response for given Hand that will produce this outcome.
+    fn response(&self, h: Hand) -> Hand {
+        match (h, &self) {
             (x, Outcome::Draw) => x,
             (Hand::Rock, Outcome::Win) => Hand::Paper,
             (Hand::Paper, Outcome::Win) => Hand::Scissors,
@@ -87,33 +97,40 @@ impl Outcome {
         }
     }
 
-    fn hand_score_from_string_p1(s: &str) -> i64 {
-        let v = s.split(' ').collect::<Vec<&str>>();
-        let h1: Hand = v[0].parse().unwrap();
-        let h2: Hand = v[1].parse().unwrap();
-        Self::hand_score(&h1, &h2)
-    }
-
-    fn hand_score_from_string_p2(s: &str) -> i64 {
-        let v = s.split(' ').collect::<Vec<&str>>();
-        let h1: Hand = v[0].parse().unwrap();
-        let o: Outcome = v[1].parse().unwrap();
-        let h2 = Self::hand_response(h1, &o);
-        Self::hand_score(&h1, &h2)
+    // Return the score when played against the given Hand for this outcome.
+    fn score_against(&self, h: Hand) -> i64 {
+        let other = &self.response(h);
+        self.score() + other.bonus()
     }
 }
 
+// Parse the line and return a tuple of Hands.
+fn parse_line_p1(s: &str) -> (Hand, Hand) {
+    let v: Vec<&str> = s.split_whitespace().collect();
+    (v[0].parse().unwrap(), v[1].parse().unwrap())
+}
+
+/// Find the total score.
 pub fn total_score_p1(s: &str) -> i64 {
     s.trim()
         .split('\n')
-        .map(Outcome::hand_score_from_string_p1)
+        .map(parse_line_p1)
+        .map(|(h1, h2)| h2.score_against(h1))
         .sum()
 }
 
+// Parse the line and return a tuple of Hand and Outcome.
+fn parse_line_p2(s: &str) -> (Hand, Outcome) {
+    let v: Vec<&str> = s.split_whitespace().collect();
+    (v[0].parse().unwrap(), v[1].parse().unwrap())
+}
+
+/// Find the total score.
 pub fn total_score_p2(s: &str) -> i64 {
     s.trim()
         .split('\n')
-        .map(Outcome::hand_score_from_string_p2)
+        .map(parse_line_p2)
+        .map(|(h, o)| o.score_against(h))
         .sum()
 }
 
