@@ -34,7 +34,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_max_total_calories_from_problem() {
+    fn test_max_total_calories() {
         let s = "1000
 2000
 3000
@@ -53,7 +53,7 @@ mod tests {
     }
 
     #[test]
-    fn test_max3_total_calories_from_problem() {
+    fn test_max3_total_calories() {
         let s = "1000
 2000
 3000
