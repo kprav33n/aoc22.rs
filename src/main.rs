@@ -16,6 +16,7 @@ fn main() {
     match command.as_ref() {
         "day01a" => println!("{}", aoc22::day01::max_total_calories(&input)),
         "day01b" => println!("{}", aoc22::day01::max3_total_calories(&input)),
+        "day02a" => println!("{}", aoc22::day02::total_score(&input)),
 
         _ => println!("{}: unknown command", command),
     }
