@@ -18,6 +18,7 @@ fn main() {
         "day01b" => println!("{}", aoc22::day01::max3_total_calories(&input)),
         "day02a" => println!("{}", aoc22::day02::total_score_p1(&input)),
         "day02b" => println!("{}", aoc22::day02::total_score_p2(&input)),
+        "day03a" => println!("{}", aoc22::day03::sum_priorities(&input)),
 
         _ => println!("{}: unknown command", command),
     }
