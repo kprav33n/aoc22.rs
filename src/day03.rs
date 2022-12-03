@@ -14,8 +14,25 @@ fn parse_line(s: &str) -> i64 {
     }
 }
 
-pub fn sum_priorities(s: &str) -> i64 {
+pub fn sum_priorities_p1(s: &str) -> i64 {
     s.trim().split_terminator("\n").map(parse_line).sum()
+}
+
+pub fn sum_priorities_p2(s: &str) -> i64 {
+    let v: Vec<&str> = s.lines().collect();
+    let chunks: Vec<&[&str]> = v.chunks(3).collect();
+    let mut sum = 0;
+    for chunk in chunks {
+        let mut s0: HashSet<char> = chunk[0].chars().collect();
+        let s1: HashSet<char> = chunk[1].chars().collect();
+        let s2: HashSet<char> = chunk[2].chars().collect();
+        s0.retain(|e| s1.contains(e));
+        s0.retain(|e| s2.contains(e));
+        let ch = s0.iter().next().unwrap();
+        let p = (*ch as i64) - 96;
+        sum += if p > 0 { p } else { p + 58 }
+    }
+    sum
 }
 
 #[cfg(test)]
@@ -23,13 +40,24 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_sum_priorities() {
+    fn test_sum_priorities_p1() {
         let s = "vJrwpWtwJgWrhcsFMMfFFhFp
 jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
 PmmdzqPrVvPwwTWBwg
 wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
 ttgJtRGJQctTZtZT
 CrZsJsPPZsGzwwsLwLmpwMDw";
-        assert_eq!(sum_priorities(s), 157);
+        assert_eq!(sum_priorities_p1(s), 157);
+    }
+
+    #[test]
+    fn test_sum_priorities_p2() {
+        let s = "vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw";
+        assert_eq!(sum_priorities_p2(s), 70);
     }
 }

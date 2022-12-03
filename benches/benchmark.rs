@@ -21,5 +21,15 @@ pub fn bench_day02(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_day01, bench_day02);
+pub fn bench_day03(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day03.txt").unwrap();
+    c.bench_function("sum_priorities_p1", |b| {
+        b.iter(|| aoc22::day03::sum_priorities_p1(&input))
+    });
+    c.bench_function("sum_priorities_p2", |b| {
+        b.iter(|| aoc22::day03::sum_priorities_p2(&input))
+    });
+}
+
+criterion_group!(benches, bench_day01, bench_day02, bench_day03);
 criterion_main!(benches);
