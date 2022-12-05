@@ -22,7 +22,8 @@ fn main() {
         "day03b" => println!("{}", aoc22::day03::sum_priorities_p2(&input)),
         "day04a" => println!("{}", aoc22::day04::num_fully_contained(&input)),
         "day04b" => println!("{}", aoc22::day04::num_overlapping(&input)),
-        "day05a" => println!("{}", aoc22::day05::top_of_stack(&input)),
+        "day05a" => println!("{}", aoc22::day05::top_of_stack_p1(&input)),
+        "day05b" => println!("{}", aoc22::day05::top_of_stack_p2(&input)),
 
         _ => println!("{}: unknown command", command),
     }

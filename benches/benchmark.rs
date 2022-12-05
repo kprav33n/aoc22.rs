@@ -43,8 +43,11 @@ pub fn bench_day04(c: &mut Criterion) {
 
 pub fn bench_day05(c: &mut Criterion) {
     let input = fs::read_to_string("input/day05.txt").unwrap();
-    c.bench_function("day05::top_of_stack", |b| {
-        b.iter(|| aoc22::day05::top_of_stack(&input))
+    c.bench_function("day05::top_of_stack_p1", |b| {
+        b.iter(|| aoc22::day05::top_of_stack_p1(&input))
+    });
+    c.bench_function("day05::top_of_stack_p2", |b| {
+        b.iter(|| aoc22::day05::top_of_stack_p2(&input))
     });
 }
 
