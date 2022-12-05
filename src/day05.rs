@@ -75,12 +75,7 @@ pub fn top_of_stack(s: &str, executor: Executor) -> String {
     let mut stacks: Vec<Vec<char>> = parse_stacks(stacks_str);
     let steps = steps_str.trim().split('\n').map(parse_step).collect();
     executor(&steps, &mut stacks);
-
-    let mut tos: Vec<char> = Vec::new();
-    for stack in stacks {
-        tos.push(*stack.last().unwrap());
-    }
-    tos.into_iter().collect()
+    stacks.iter().map(|v| v.last().unwrap()).collect()
 }
 
 // Parse stacks, steps and compute top of tack after executing steps according
