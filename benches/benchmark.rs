@@ -41,5 +41,19 @@ pub fn bench_day04(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_day01, bench_day02, bench_day03, bench_day04);
+pub fn bench_day05(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day05.txt").unwrap();
+    c.bench_function("day05::top_of_stack", |b| {
+        b.iter(|| aoc22::day05::top_of_stack(&input))
+    });
+}
+
+criterion_group!(
+    benches,
+    bench_day01,
+    bench_day02,
+    bench_day03,
+    bench_day04,
+    bench_day05
+);
 criterion_main!(benches);
