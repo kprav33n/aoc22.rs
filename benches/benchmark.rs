@@ -53,8 +53,11 @@ pub fn bench_day05(c: &mut Criterion) {
 
 pub fn bench_day06(c: &mut Criterion) {
     let input = fs::read_to_string("input/day06.txt").unwrap();
-    c.bench_function("day06::start_of_packet", |b| {
-        b.iter(|| aoc22::day06::start_of_packet(&input))
+    c.bench_function("day06::start_of_packet_p1", |b| {
+        b.iter(|| aoc22::day06::start_of_packet_p1(&input))
+    });
+    c.bench_function("day06::start_of_packet_p2", |b| {
+        b.iter(|| aoc22::day06::start_of_packet_p2(&input))
     });
 }
 
