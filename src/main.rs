@@ -24,6 +24,7 @@ fn main() {
         "day04b" => println!("{}", aoc22::day04::num_overlapping(&input)),
         "day05a" => println!("{}", aoc22::day05::top_of_stack_p1(&input)),
         "day05b" => println!("{}", aoc22::day05::top_of_stack_p2(&input)),
+        "day06a" => println!("{}", aoc22::day06::start_of_packet(&input)),
 
         _ => println!("{}: unknown command", command),
     }

@@ -51,12 +51,20 @@ pub fn bench_day05(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day06(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day06.txt").unwrap();
+    c.bench_function("day06::start_of_packet", |b| {
+        b.iter(|| aoc22::day06::start_of_packet(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
     bench_day02,
     bench_day03,
     bench_day04,
-    bench_day05
+    bench_day05,
+    bench_day06
 );
 criterion_main!(benches);
