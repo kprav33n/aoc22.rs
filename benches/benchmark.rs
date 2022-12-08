@@ -66,6 +66,9 @@ pub fn bench_day07(c: &mut Criterion) {
     c.bench_function("day07::total_size_p1", |b| {
         b.iter(|| aoc22::day06::start_of_packet_p1(&input))
     });
+    c.bench_function("day07::total_size_p2", |b| {
+        b.iter(|| aoc22::day06::start_of_packet_p2(&input))
+    });
 }
 
 criterion_group!(
