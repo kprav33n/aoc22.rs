@@ -1,5 +1,3 @@
-use std::cmp;
-
 pub fn num_visible_trees(s: &str) -> usize {
     let trees: Vec<Vec<u8>> = s
         .trim()
@@ -129,9 +127,9 @@ pub fn highest_scenic_score(s: &str) -> usize {
         }
     }
 
-    score.iter().fold(0, |acc, v| {
-        cmp::max(acc, v.iter().fold(0, |acc, &s| cmp::max(acc, s)))
-    })
+    score
+        .iter()
+        .fold(0, |acc, v| acc.max(v.iter().fold(0, |acc, &s| acc.max(s))))
 }
 
 #[cfg(test)]
