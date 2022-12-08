@@ -1,14 +1,17 @@
+use std::cmp;
+
 pub fn num_visible_trees(s: &str) -> usize {
     let trees: Vec<Vec<u8>> = s
         .trim()
         .split('\n')
-        .map(|l| l.as_bytes().iter().map(|b| b - '0' as u8).collect())
+        .map(|l| l.as_bytes().iter().map(|b| b - b'0').collect())
         .collect();
     let num_rows = trees.len();
     let num_columns = trees[0].len();
     let mut visible = vec![vec![false; num_columns]; num_rows];
 
     // Initialize perimeter.
+    #[allow(clippy::needless_range_loop)]
     for i in 0..num_rows {
         visible[i][0] = true;
         visible[i][num_columns - 1] = true;
@@ -74,22 +77,16 @@ pub fn num_visible_trees(s: &str) -> usize {
         }
     }
 
-    let mut count = 0;
-    for i in 0..num_rows {
-        for j in 0..num_columns {
-            if visible[i][j] {
-                count += 1;
-            }
-        }
-    }
-    count
+    visible.iter().fold(0, |acc, v| {
+        acc + v.iter().fold(0, |acc, &p| if p { acc + 1 } else { acc })
+    })
 }
 
 pub fn highest_scenic_score(s: &str) -> usize {
     let trees: Vec<Vec<u8>> = s
         .trim()
         .split('\n')
-        .map(|l| l.as_bytes().iter().map(|b| b - '0' as u8).collect())
+        .map(|l| l.as_bytes().iter().map(|b| b - b'0').collect())
         .collect();
     let num_rows = trees.len();
     let num_columns = trees[0].len();
@@ -132,15 +129,9 @@ pub fn highest_scenic_score(s: &str) -> usize {
         }
     }
 
-    let mut max = 0;
-    for i in 0..num_rows {
-        for j in 0..num_columns {
-            if score[i][j] > max {
-                max = score[i][j]
-            }
-        }
-    }
-    max
+    score.iter().fold(0, |acc, v| {
+        cmp::max(acc, v.iter().fold(0, |acc, &s| cmp::max(acc, s)))
+    })
 }
 
 #[cfg(test)]
