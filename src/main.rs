@@ -26,6 +26,7 @@ fn main() {
         "day05b" => println!("{}", aoc22::day05::top_of_stack_p2(&input)),
         "day06a" => println!("{}", aoc22::day06::start_of_packet_p1(&input)),
         "day06b" => println!("{}", aoc22::day06::start_of_packet_p2(&input)),
+        "day07a" => println!("{}", aoc22::day07::total_size_p1(&input)),
 
         _ => println!("{}: unknown command", command),
     }
