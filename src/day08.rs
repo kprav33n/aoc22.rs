@@ -8,70 +8,14 @@ pub fn num_visible_trees(s: &str) -> usize {
     let num_columns = trees[0].len();
     let mut visible = vec![vec![false; num_columns]; num_rows];
 
-    // Initialize perimeter.
-    #[allow(clippy::needless_range_loop)]
     for i in 0..num_rows {
-        visible[i][0] = true;
-        visible[i][num_columns - 1] = true;
-    }
-    for j in 0..num_columns {
-        visible[0][j] = true;
-        visible[num_rows - 1][j] = true;
-    }
-
-    for i in 1..(num_rows - 1) {
-        for j in 1..(num_columns - 1) {
-            // From top?
-            let mut v = true;
-            for k in (0..i).rev() {
-                if trees[i][j] <= trees[k][j] {
-                    v = false;
-                    break;
-                }
-            }
-            if v {
-                visible[i][j] = true;
-                continue;
-            }
-
-            // From left?
-            let mut v = true;
-            for k in (0..j).rev() {
-                if trees[i][j] <= trees[i][k] {
-                    v = false;
-                    break;
-                }
-            }
-            if v {
-                visible[i][j] = true;
-                continue;
-            }
-
-            // From bottom?
-            let mut v = true;
-            for k in i + 1..num_rows {
-                if trees[i][j] <= trees[k][j] {
-                    v = false;
-                    break;
-                }
-            }
-            if v {
-                visible[i][j] = true;
-                continue;
-            }
-
-            // From right?
-            let mut v = true;
-            for k in j + 1..num_columns {
-                if trees[i][j] <= trees[i][k] {
-                    v = false;
-                    break;
-                }
-            }
-            if v {
-                visible[i][j] = true;
-                continue;
-            }
+        for j in 0..num_columns {
+            let height = trees[i][j];
+            // Courtesy: https://github.com/Basicprogrammer10/Advent-Of-Code/blob/master/src/solutions/year_2022/day_08.rs
+            visible[i][j] = trees[..i].iter().all(|v| v[j] < height)
+                || trees[i][..j].iter().all(|&t| t < height)
+                || trees[i + 1..].iter().all(|v| v[j] < height)
+                || trees[i][j + 1..].iter().all(|&t| t < height);
         }
     }
 
