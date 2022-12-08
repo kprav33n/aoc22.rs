@@ -76,6 +76,9 @@ pub fn bench_day08(c: &mut Criterion) {
     c.bench_function("day08::num_visible_trees", |b| {
         b.iter(|| aoc22::day08::num_visible_trees(&input))
     });
+    c.bench_function("day08::highest_scenic_score", |b| {
+        b.iter(|| aoc22::day08::highest_scenic_score(&input))
+    });
 }
 
 criterion_group!(
