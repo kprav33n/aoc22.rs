@@ -71,6 +71,13 @@ pub fn bench_day07(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day08(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day08.txt").unwrap();
+    c.bench_function("day08::num_visible_trees", |b| {
+        b.iter(|| aoc22::day08::num_visible_trees(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -80,5 +87,6 @@ criterion_group!(
     bench_day05,
     bench_day06,
     bench_day07,
+    bench_day08,
 );
 criterion_main!(benches);

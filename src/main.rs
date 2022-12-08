@@ -28,6 +28,7 @@ fn main() {
         "day06b" => println!("{}", aoc22::day06::start_of_packet_p2(&input)),
         "day07a" => println!("{}", aoc22::day07::total_size_p1(&input)),
         "day07b" => println!("{}", aoc22::day07::total_size_p2(&input)),
+        "day08a" => println!("{}", aoc22::day08::num_visible_trees(&input)),
 
         _ => println!("{}: unknown command", command),
     }
