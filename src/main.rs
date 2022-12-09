@@ -30,6 +30,7 @@ fn main() {
         "day07b" => println!("{}", aoc22::day07::total_size_p2(&input)),
         "day08a" => println!("{}", aoc22::day08::num_visible_trees(&input)),
         "day08b" => println!("{}", aoc22::day08::highest_scenic_score(&input)),
+        "day09a" => println!("{}", aoc22::day09::num_tail_positions(&input)),
 
         _ => println!("{}: unknown command", command),
     }
