@@ -81,6 +81,16 @@ pub fn bench_day08(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day09(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day09.txt").unwrap();
+    c.bench_function("day09::num_tail_positions_p1", |b| {
+        b.iter(|| aoc22::day09::num_tail_positions_p1(&input))
+    });
+    c.bench_function("day09::num_tail_positions_p2", |b| {
+        b.iter(|| aoc22::day09::num_tail_positions_p2(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -91,5 +101,6 @@ criterion_group!(
     bench_day06,
     bench_day07,
     bench_day08,
+    bench_day09,
 );
 criterion_main!(benches);
