@@ -40,26 +40,10 @@ pub fn num_tail_positions(s: &str) -> usize {
 
     let mut update_head = |row: i64, col: i64| {
         head = (head.0 + row, head.1 + col);
-        let row_offset: i64 = head.0 - tail.0;
-        let col_offset: i64 = head.1 - tail.1;
-        if (row_offset == 0 && col_offset == 0)
-            || (row_offset == 0 && col_offset.abs() == 1)
-            || (row_offset.abs() == 1 && col_offset == 0)
-            || (row_offset.abs() == 1 && col_offset.abs() == 1)
-        {
-            return;
-        }
-
-        if row_offset == 0 {
-            tail = (tail.0, tail.1 + col_offset / 2);
-        } else if col_offset == 0 {
-            tail = (tail.0 + row_offset / 2, tail.1);
-        } else if row_offset.abs() == 2 {
-            tail = (tail.0 + row_offset.signum(), tail.1 + col_offset);
-        } else if col_offset.abs() == 2 {
-            tail = (tail.0 + row_offset, tail.1 + col_offset.signum());
-        } else {
-            unreachable!();
+        let (row_offset, col_offset) = (head.0 - tail.0, head.1 - tail.1);
+        let (row_op, col_op) = (row_offset.signum(), col_offset.signum());
+        if row_offset.abs() > 1 || col_offset.abs() > 1 {
+            tail = (tail.0 + row_op, tail.1 + col_op);
         }
         tail_positions.insert(tail);
     };
