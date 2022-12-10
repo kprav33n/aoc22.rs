@@ -31,6 +31,27 @@ impl FromStr for Command {
     }
 }
 
+impl Command {
+    fn move_tuple(&self) -> (usize, i64, i64) {
+        match &self {
+            Command::Left(n) => (*n, 0, -1),
+            Command::Right(n) => (*n, 0, 1),
+            Command::Up(n) => (*n, 1, 0),
+            Command::Down(n) => (*n, -1, 0),
+        }
+    }
+
+    fn execute<F>(&self, mut update_fn: F)
+    where
+        F: FnMut(i64, i64),
+    {
+        let (n, row, col) = self.move_tuple();
+        for _ in 0..n {
+            update_fn(row, col);
+        }
+    }
+}
+
 // Return the number of positions tail visited at least once.
 fn num_tail_positions(s: &str, n: usize) -> usize {
     let mut knots = vec![(0, 0); n];
@@ -52,34 +73,8 @@ fn num_tail_positions(s: &str, n: usize) -> usize {
 
     let lines: Vec<&str> = s.trim().split('\n').collect();
     for line in lines {
-        let Ok(command) = line.parse() else {
-            unreachable!();
-        };
-        match command {
-            Command::Left(n) => {
-                for _ in 0..n {
-                    update_head(0, -1);
-                }
-            }
-
-            Command::Right(n) => {
-                for _ in 0..n {
-                    update_head(0, 1);
-                }
-            }
-
-            Command::Up(n) => {
-                for _ in 0..n {
-                    update_head(1, 0);
-                }
-            }
-
-            Command::Down(n) => {
-                for _ in 0..n {
-                    update_head(-1, 0);
-                }
-            }
-        }
+        let command: Command = line.parse().unwrap();
+        command.execute(&mut update_head);
     }
     tail_positions.len()
 }
