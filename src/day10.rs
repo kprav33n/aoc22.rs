@@ -62,7 +62,7 @@ pub fn render_image(s: &str) -> String {
     const CRT_WIDTH: usize = 40;
     let crt_height = (values.len() - 1) / CRT_WIDTH;
     let mut screen = vec![vec!['#'; CRT_WIDTH]; crt_height];
-    for (i, &value) in values.iter().skip(1).enumerate().skip(1) {
+    for (i, &value) in values.iter().skip(1).enumerate() {
         let (row, col) = (i / CRT_WIDTH, i % CRT_WIDTH);
         screen[row][col] = if (col as i64 - value).abs() <= 1 {
             '#'
