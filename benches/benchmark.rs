@@ -91,6 +91,16 @@ pub fn bench_day09(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day10(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day10.txt").unwrap();
+    c.bench_function("day10::sum_of_signal_strengths", |b| {
+        b.iter(|| aoc22::day10::sum_of_signal_strengths(&input))
+    });
+    c.bench_function("day10::render_image", |b| {
+        b.iter(|| aoc22::day10::render_image(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -102,5 +112,6 @@ criterion_group!(
     bench_day07,
     bench_day08,
     bench_day09,
+    bench_day10,
 );
 criterion_main!(benches);

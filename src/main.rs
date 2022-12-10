@@ -33,6 +33,7 @@ fn main() {
         "day09a" => println!("{}", aoc22::day09::num_tail_positions_p1(&input)),
         "day09b" => println!("{}", aoc22::day09::num_tail_positions_p2(&input)),
         "day10a" => println!("{}", aoc22::day10::sum_of_signal_strengths(&input)),
+        "day10b" => println!("{}", aoc22::day10::render_image(&input)),
 
         _ => println!("{}: unknown command", command),
     }

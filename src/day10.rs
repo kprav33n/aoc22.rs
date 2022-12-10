@@ -26,33 +26,55 @@ impl FromStr for Instruction {
     }
 }
 
-pub fn sum_of_signal_strengths(s: &str) -> i64 {
+// Return register values after executing the given program.
+fn register_values(s: &str) -> Vec<i64> {
     let instructions: Vec<Instruction> = s.trim().split('\n').map(|s| s.parse().unwrap()).collect();
-    let mut signal = 1;
-    let mut signals: Vec<i64> = vec![0];
+    let mut x = 1;
+    let mut values: Vec<i64> = vec![0];
     for instruction in &instructions {
         match instruction {
             Instruction::Noop => {
-                signals.push(signal);
+                values.push(x);
             }
             Instruction::AddX(n) => {
-                signals.push(signal);
-                signals.push(signal);
-                signal += n;
+                values.push(x);
+                values.push(x);
+                x += n;
             }
         }
     }
-    signals.push(signal);
+    values
+}
 
-    let mut sum = 0;
-    let starting = 20;
-    let every = 40;
-    for (i, signal) in signals.iter().enumerate().skip(starting) {
-        if (i == starting) || (i - starting) % every == 0 {
-            sum += i as i64 * signal;
+// Compute the sum of signal strengths for the given program.
+pub fn sum_of_signal_strengths(s: &str) -> i64 {
+    register_values(s)
+        .iter()
+        .enumerate()
+        .skip(20)
+        .step_by(40)
+        .fold(0, |acc, (i, signal)| acc + i as i64 * signal)
+}
+
+// Render image on CRT based on the given program.
+pub fn render_image(s: &str) -> String {
+    let values = register_values(s);
+    const CRT_WIDTH: usize = 40;
+    let crt_height = (values.len() - 1) / CRT_WIDTH;
+    let mut screen = vec![vec!['#'; CRT_WIDTH]; crt_height];
+    for (i, &value) in values.iter().skip(1).enumerate().skip(1) {
+        let (row, col) = (i / CRT_WIDTH, i % CRT_WIDTH);
+        screen[row][col] = if (col as i64 - value).abs() <= 1 {
+            '#'
+        } else {
+            '.'
         }
     }
-    sum
+    screen
+        .iter()
+        .map(|v| v.iter().collect::<String>())
+        .collect::<Vec<String>>()
+        .join("\n")
 }
 
 #[cfg(test)]
@@ -67,9 +89,7 @@ addx -5";
         assert_eq!(sum_of_signal_strengths(input), 0);
     }
 
-    #[test]
-    fn test_num_tail_positions_p1() {
-        let input = "addx 15
+    const INPUT: &str = "addx 15
 addx -11
 addx 6
 addx -3
@@ -215,6 +235,20 @@ addx -11
 noop
 noop
 noop";
-        assert_eq!(sum_of_signal_strengths(input), 13140)
+
+    #[test]
+    fn test_sum_of_signal_strengths() {
+        assert_eq!(sum_of_signal_strengths(INPUT), 13140)
+    }
+
+    #[test]
+    fn test_render_image() {
+        let output = "##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....";
+        assert_eq!(render_image(INPUT), output)
     }
 }
