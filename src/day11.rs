@@ -10,12 +10,12 @@ pub struct Monkey {
 }
 
 impl Monkey {
-    fn turn(&mut self) -> Vec<(usize, i64)> {
+    fn turn(&mut self, manage: fn(i64) -> i64) -> Vec<(usize, i64)> {
         let mut throws: Vec<(usize, i64)> = Vec::new();
         while !self.items.is_empty() {
             let item = self.items.pop_front().unwrap();
             let mut new = (self.operation)(item);
-            new /= 3;
+            new = manage(new);
             if (self.test)(new) {
                 throws.push((self.on_true, new));
             } else {
@@ -99,11 +99,28 @@ pub fn input() -> Vec<Monkey> {
 pub fn monkey_business_level(monkeys: &mut Vec<Monkey>) -> usize {
     for _ in 0..20 {
         for i in 0..monkeys.len() {
-            let moves = monkeys[i].turn();
+            let moves = monkeys[i].turn(|worry| worry / 3);
             for (to, item) in moves {
                 monkeys[to].items.push_back(item);
             }
         }
+    }
+    let mut inspections: Vec<usize> = monkeys.iter().map(|m| m.num_inspections).collect();
+    inspections.sort_by(|a, b| b.cmp(a));
+    inspections[0] * inspections[1]
+}
+
+pub fn monkey_business_level_p2(monkeys: &mut Vec<Monkey>) -> usize {
+    for _ in 0..10000 {
+        for i in 0..monkeys.len() {
+            // let moves = monkeys[i].turn(|worry| worry % (23 * 19 * 13 * 17));
+            let moves = monkeys[i].turn(|worry| worry % (7 * 13 * 5 * 19 * 2 * 11 * 17 * 3));
+            for (to, item) in moves {
+                monkeys[to].items.push_back(item);
+            }
+        }
+        let inspections: Vec<usize> = monkeys.iter().map(|m| m.num_inspections).collect();
+        println!("{:?}", inspections);
     }
     let mut inspections: Vec<usize> = monkeys.iter().map(|m| m.num_inspections).collect();
     inspections.sort_by(|a, b| b.cmp(a));
@@ -124,40 +141,11 @@ mod tests {
             on_false: 3,
             num_inspections: 0,
         };
-        assert_eq!(monkey.turn(), vec![(3, 500), (3, 620)]);
+        assert_eq!(monkey.turn(|worry| worry / 3), vec![(3, 500), (3, 620)]);
     }
 
-    #[test]
-    fn test_monkey_business_level() {
-        // TODO: Parse later.
-        //         let input = "Monkey 0:
-        //   Starting items: 79, 98
-        //   Operation: new = old * 19
-        //   Test: divisible by 23
-        //     If true: throw to monkey 2
-        //     If false: throw to monkey 3
-
-        // Monkey 1:
-        //   Starting items: 54, 65, 75, 74
-        //   Operation: new = old + 6
-        //   Test: divisible by 19
-        //     If true: throw to monkey 2
-        //     If false: throw to monkey 0
-
-        // Monkey 2:
-        //   Starting items: 79, 60, 97
-        //   Operation: new = old * old
-        //   Test: divisible by 13
-        //     If true: throw to monkey 1
-        //     If false: throw to monkey 3
-
-        // Monkey 3:
-        //   Starting items: 74
-        //   Operation: new = old + 3
-        //   Test: divisible by 17
-        //     If true: throw to monkey 0
-        //     If false: throw to monkey 1";
-        let mut monkeys = vec![
+    fn test_input() -> Vec<Monkey> {
+        vec![
             Monkey {
                 items: VecDeque::from_iter(vec![79, 98]),
                 operation: |old| old * 19,
@@ -190,8 +178,45 @@ mod tests {
                 on_false: 1,
                 num_inspections: 0,
             },
-        ];
+        ]
+    }
 
-        assert_eq!(monkey_business_level(&mut monkeys), 10605)
+    #[test]
+    fn test_monkey_business_level() {
+        // TODO: Parse later.
+        //         let input = "Monkey 0:
+        //   Starting items: 79, 98
+        //   Operation: new = old * 19
+        //   Test: divisible by 23
+        //     If true: throw to monkey 2
+        //     If false: throw to monkey 3
+
+        // Monkey 1:
+        //   Starting items: 54, 65, 75, 74
+        //   Operation: new = old + 6
+        //   Test: divisible by 19
+        //     If true: throw to monkey 2
+        //     If false: throw to monkey 0
+
+        // Monkey 2:
+        //   Starting items: 79, 60, 97
+        //   Operation: new = old * old
+        //   Test: divisible by 13
+        //     If true: throw to monkey 1
+        //     If false: throw to monkey 3
+
+        // Monkey 3:
+        //   Starting items: 74
+        //   Operation: new = old + 3
+        //   Test: divisible by 17
+        //     If true: throw to monkey 0
+        //     If false: throw to monkey 1";
+
+        assert_eq!(monkey_business_level(&mut test_input()), 10605)
+    }
+
+    #[test]
+    fn test_monkey_business_level_p2() {
+        assert_eq!(monkey_business_level_p2(&mut test_input()), 2713310158)
     }
 }

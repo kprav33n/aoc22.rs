@@ -34,10 +34,14 @@ fn main() {
         "day09b" => println!("{}", aoc22::day09::num_tail_positions_p2(&input)),
         "day10a" => println!("{}", aoc22::day10::sum_of_signal_strengths(&input)),
         "day10b" => println!("{}", aoc22::day10::render_image(&input)),
-        "day11a" => {
-            let mut monkeys = aoc22::day11::input();
-            println!("{}", aoc22::day11::monkey_business_level(&mut monkeys))
-        }
+        "day11a" => println!(
+            "{}",
+            aoc22::day11::monkey_business_level(&mut aoc22::day11::input())
+        ),
+        "day11b" => println!(
+            "{}",
+            aoc22::day11::monkey_business_level_p2(&mut aoc22::day11::input())
+        ),
 
         _ => println!("{}: unknown command", command),
     }
