@@ -106,10 +106,21 @@ pub fn bench_day11(c: &mut Criterion) {
     c.bench_function("day11::monkey_business_level_p1", |b| {
         b.iter(|| aoc22::day11::monkey_business_level_p1(&input))
     });
-    c.bench_function("day11::_monkey_business_level_p2", |b| {
+    c.bench_function("day11::monkey_business_level_p2", |b| {
         b.iter(|| aoc22::day11::monkey_business_level_p2(&input))
     });
 }
+
+pub fn bench_day12(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day12.txt").unwrap();
+    c.bench_function("day12::num_steps_to_target_p1", |b| {
+        b.iter(|| aoc22::day12::num_steps_to_target_p1(&input))
+    });
+    c.bench_function("day12::num_steps_to_target_p2", |b| {
+        b.iter(|| aoc22::day12::num_steps_to_target_p2(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -123,5 +134,6 @@ criterion_group!(
     bench_day09,
     bench_day10,
     bench_day11,
+    bench_day12,
 );
 criterion_main!(benches);

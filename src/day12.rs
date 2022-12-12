@@ -35,34 +35,70 @@ impl FromStr for HeightMap {
 }
 
 impl HeightMap {
-    fn adjancencies(&self, pos: &Position) -> Vec<Position> {
-        let mut v: Vec<Position> = Vec::new();
-        if pos.0 > 0 {
-            v.push(Position(pos.0 - 1, pos.1));
-        }
-        if pos.0 < self.grid.len() - 1 {
-            v.push(Position(pos.0 + 1, pos.1));
-        }
-        if pos.1 > 0 {
-            v.push(Position(pos.0, pos.1 - 1));
-        }
-        if pos.1 < self.grid[pos.0].len() - 1 {
-            v.push(Position(pos.0, pos.1 + 1));
-        }
-        v.into_iter()
-            .filter(|p| (self.grid[p.0][p.1] as i64 - self.grid[pos.0][pos.1] as i64) <= 1)
-            .collect::<Vec<_>>()
+    fn neighbors(&self, pos: &Position) -> Vec<Position> {
+        vec![
+            if pos.0 > 0 {
+                Some(Position(pos.0 - 1, pos.1))
+            } else {
+                None
+            },
+            if pos.0 < self.grid.len() - 1 {
+                Some(Position(pos.0 + 1, pos.1))
+            } else {
+                None
+            },
+            if pos.1 > 0 {
+                Some(Position(pos.0, pos.1 - 1))
+            } else {
+                None
+            },
+            if pos.1 < self.grid[pos.0].len() - 1 {
+                Some(Position(pos.0, pos.1 + 1))
+            } else {
+                None
+            },
+        ]
+        .into_iter()
+        .flatten()
+        .filter(|p| self.grid[p.0][p.1] as i64 - self.grid[pos.0][pos.1] as i64 <= 1)
+        .collect::<Vec<_>>()
+    }
+
+    fn shortest_path(&self, start: &Position) -> Option<Vec<Position>> {
+        bfs(start, |p| self.neighbors(p), |&p| p == self.end)
     }
 }
 
-pub fn num_steps_to_target(s: &str) -> usize {
+pub fn num_steps_to_target_p1(s: &str) -> usize {
     let Ok(map) = s.parse::<HeightMap>() else {
         unreachable!();
     };
-    let Some(path) = bfs(&map.start, |p| map.adjancencies(p), |&p| p == map.end) else {
+    let Some(path) = map.shortest_path(&map.start) else {
         unreachable!();
     };
     path.len() - 1
+}
+
+pub fn num_steps_to_target_p2(s: &str) -> usize {
+    let Ok(map) = s.parse::<HeightMap>() else {
+        unreachable!();
+    };
+
+    let mut starts: Vec<Position> = Vec::new();
+    for (i, row) in map.grid.iter().enumerate() {
+        for (j, &ch) in row.iter().enumerate() {
+            if ch == 'a' {
+                starts.push(Position(i, j));
+            }
+        }
+    }
+
+    starts
+        .iter()
+        .filter_map(|start| map.shortest_path(start))
+        .map(|path| path.len() - 1)
+        .min()
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -76,7 +112,12 @@ acctuvwj
 abdefghi";
 
     #[test]
-    fn test_num_steps_to_target() {
-        assert_eq!(num_steps_to_target(INPUT), 31);
+    fn test_num_steps_to_target_p1() {
+        assert_eq!(num_steps_to_target_p1(INPUT), 31);
+    }
+
+    #[test]
+    fn test_num_steps_to_target_p2() {
+        assert_eq!(num_steps_to_target_p2(INPUT), 29);
     }
 }
