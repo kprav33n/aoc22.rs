@@ -36,7 +36,7 @@ impl FromStr for HeightMap {
 
 impl HeightMap {
     fn neighbors(&self, pos: &Position) -> Vec<Position> {
-        vec![
+        [
             if pos.0 > 0 {
                 Some(Position(pos.0 - 1, pos.1))
             } else {
