@@ -21,7 +21,7 @@ fn compare(left: Value, right: Value) -> Ordering {
 }
 
 // Return the sum of indices of pairs who are in the right order.
-pub fn sum_right_indices(s: &str) -> i64 {
+pub fn sum_right_indices(s: &str) -> usize {
     let pairs: Vec<&str> = s.trim().split("\n\n").collect();
     pairs
         .iter()
@@ -38,11 +38,32 @@ pub fn sum_right_indices(s: &str) -> i64 {
         .enumerate()
         .fold(0, |acc, (i, ord)| {
             if ord == Ordering::Less {
-                acc + i as i64 + 1
+                acc + i + 1
             } else {
                 acc
             }
         })
+}
+
+// Return the decoder key.
+pub fn decoder_key(s: &str) -> usize {
+    let mut packets: Vec<Value> = s
+        .trim()
+        .replace("\n\n", "\n")
+        .lines()
+        .map(|s| serde_json::from_str(s).unwrap())
+        .collect();
+    let m1: Value = serde_json::from_str("[[2]]").unwrap();
+    let m2: Value = serde_json::from_str("[[6]]").unwrap();
+    packets.extend([m1.clone(), m2.clone()]);
+    packets.sort_by(|l, r| compare(l.clone(), r.clone()));
+    packets.iter().enumerate().fold(1, |acc, (i, v)| {
+        if v.clone() == m1 || v.clone() == m2 {
+            acc * (i + 1)
+        } else {
+            acc
+        }
+    })
 }
 
 #[cfg(test)]
@@ -109,5 +130,10 @@ mod tests {
     #[test]
     fn test_sum_right_indices() {
         assert_eq!(sum_right_indices(INPUT), 13);
+    }
+
+    #[test]
+    fn test_decoder_key() {
+        assert_eq!(decoder_key(INPUT), 140);
     }
 }

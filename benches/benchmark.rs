@@ -121,6 +121,16 @@ pub fn bench_day12(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day13(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day13.txt").unwrap();
+    c.bench_function("day13::sum_right_indices", |b| {
+        b.iter(|| aoc22::day13::sum_right_indices(&input))
+    });
+    c.bench_function("day13::decoder_key", |b| {
+        b.iter(|| aoc22::day13::decoder_key(&input))
+    });
+}
+
 pub fn bench_day14(c: &mut Criterion) {
     let input = fs::read_to_string("input/day14.txt").unwrap();
     c.bench_function("day14::num_resting_sand_units_p1", |b| {
@@ -145,6 +155,7 @@ criterion_group!(
     bench_day10,
     bench_day11,
     bench_day12,
+    bench_day13,
     bench_day14,
 );
 criterion_main!(benches);
