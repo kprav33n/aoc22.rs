@@ -23,7 +23,7 @@ impl FromStr for Position {
 
 impl Position {
     fn new(x: i64, y: i64) -> Self {
-        return Self { x, y };
+        Self { x, y }
     }
 }
 
@@ -40,6 +40,7 @@ struct Ground {
     grid: HashMap<Position, Material>,
     deepest: i64,
     num_sand_units: usize,
+    till_floor: bool,
 }
 
 impl Ground {
@@ -49,6 +50,7 @@ impl Ground {
             grid: HashMap::new(),
             deepest: i64::MIN,
             num_sand_units: 0,
+            till_floor: false,
         }
     }
 
@@ -77,10 +79,13 @@ impl Ground {
                 None => {
                     self.grid.insert(position.clone(), Material::Sand);
                     self.num_sand_units += 1;
+                    if position == self.source {
+                        break;
+                    }
                     position = self.source.clone();
                 }
                 Some(next) => {
-                    if next.y > self.deepest {
+                    if !self.till_floor && next.y > self.deepest {
                         break;
                     }
                     position = next
@@ -90,6 +95,9 @@ impl Ground {
     }
 
     fn next_position(&self, p: &Position) -> Option<Position> {
+        if self.till_floor && p.y == self.deepest + 1 {
+            return None;
+        }
         let candidates = [
             Position::new(p.x, p.y + 1),
             Position::new(p.x - 1, p.y + 1),
@@ -105,14 +113,26 @@ impl Ground {
     }
 }
 
-pub fn num_resting_sand_units(s: &str) -> usize {
+// Return number of resting sand units.
+pub fn num_resting_sand_units(s: &str, till_floor: bool) -> usize {
     let mut ground = Ground::new();
+    ground.till_floor = till_floor;
     let paths: Vec<&str> = s.trim().split('\n').collect();
     for path in paths {
         ground.parse_path(path);
     }
     ground.start_filling();
     ground.num_sand_units
+}
+
+// Return number of resting sand units according to part 1.
+pub fn num_resting_sand_units_p1(s: &str) -> usize {
+    num_resting_sand_units(s, false)
+}
+
+// Return number of resting sand units according to part 2.
+pub fn num_resting_sand_units_p2(s: &str) -> usize {
+    num_resting_sand_units(s, true)
 }
 
 #[cfg(test)]
@@ -124,6 +144,11 @@ mod tests {
 
     #[test]
     fn test_num_resting_sand_units() {
-        assert_eq!(num_resting_sand_units(INPUT), 24);
+        assert_eq!(num_resting_sand_units_p1(INPUT), 24);
+    }
+
+    #[test]
+    fn test_num_resting_sand_units_p2() {
+        assert_eq!(num_resting_sand_units_p2(INPUT), 93);
     }
 }

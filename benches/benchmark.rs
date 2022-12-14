@@ -121,6 +121,16 @@ pub fn bench_day12(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day14(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day14.txt").unwrap();
+    c.bench_function("day14::num_resting_sand_units_p1", |b| {
+        b.iter(|| aoc22::day14::num_resting_sand_units_p1(&input))
+    });
+    c.bench_function("day14::num_resting_sand_units_p2", |b| {
+        b.iter(|| aoc22::day14::num_resting_sand_units_p2(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -135,5 +145,6 @@ criterion_group!(
     bench_day10,
     bench_day11,
     bench_day12,
+    bench_day14,
 );
 criterion_main!(benches);

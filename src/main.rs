@@ -39,7 +39,8 @@ fn main() {
         "day12a" => println!("{}", aoc22::day12::num_steps_to_target_p1(&input)),
         "day12b" => println!("{}", aoc22::day12::num_steps_to_target_p2(&input)),
         "day13a" => println!("{}", aoc22::day13::tbd(&input)),
-        "day14a" => println!("{}", aoc22::day14::num_resting_sand_units(&input)),
+        "day14a" => println!("{}", aoc22::day14::num_resting_sand_units_p1(&input)),
+        "day14b" => println!("{}", aoc22::day14::num_resting_sand_units_p2(&input)),
 
         _ => println!("{}: unknown command", command),
     }
