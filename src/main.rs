@@ -38,6 +38,7 @@ fn main() {
         "day11b" => println!("{}", aoc22::day11::monkey_business_level_p2(&input)),
         "day12a" => println!("{}", aoc22::day12::num_steps_to_target_p1(&input)),
         "day12b" => println!("{}", aoc22::day12::num_steps_to_target_p2(&input)),
+        "day13a" => println!("{}", aoc22::day13::tbd(&input)),
 
         _ => println!("{}: unknown command", command),
     }
