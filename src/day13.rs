@@ -22,9 +22,8 @@ fn compare(left: Value, right: Value) -> Ordering {
 
 // Return the sum of indices of pairs who are in the right order.
 pub fn sum_right_indices(s: &str) -> usize {
-    let pairs: Vec<&str> = s.trim().split("\n\n").collect();
-    pairs
-        .iter()
+    s.trim()
+        .split("\n\n")
         .map(|s| {
             let Some((left, right)) = s.split_once('\n') else {
             unreachable!();
@@ -57,6 +56,7 @@ pub fn decoder_key(s: &str) -> usize {
     let m2: Value = serde_json::from_str("[[6]]").unwrap();
     packets.extend([m1.clone(), m2.clone()]);
     packets.sort_by(|l, r| compare(l.clone(), r.clone()));
+
     packets.iter().enumerate().fold(1, |acc, (i, v)| {
         if v.clone() == m1 || v.clone() == m2 {
             acc * (i + 1)
