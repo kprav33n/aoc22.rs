@@ -26,11 +26,11 @@ pub fn sum_right_indices(s: &str) -> usize {
         .split("\n\n")
         .map(|s| {
             let Some((left, right)) = s.split_once('\n') else {
-            unreachable!();
+                unreachable!();
         };
             let (Ok(left), Ok(right)) = (serde_json::from_str(left),
-                                     serde_json::from_str(right)) else {
-            unreachable!();
+                                         serde_json::from_str(right)) else {
+                unreachable!();
         };
             compare(left, right)
         })
