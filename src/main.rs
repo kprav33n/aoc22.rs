@@ -42,6 +42,7 @@ fn main() {
         "day13b" => println!("{}", aoc22::day13::decoder_key(&input)),
         "day14a" => println!("{}", aoc22::day14::num_resting_sand_units_p1(&input)),
         "day14b" => println!("{}", aoc22::day14::num_resting_sand_units_p2(&input)),
+        "day15a" => println!("{}", aoc22::day15::num_empty_positions(&input, 2000000)),
 
         _ => println!("{}: unknown command", command),
     }
