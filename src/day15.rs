@@ -69,7 +69,10 @@ pub fn num_empty_positions(s: &str, row: i64) -> usize {
     let report: Vec<ReportEntry> = s
         .trim()
         .lines()
-        .map(|s| s.parse().unwrap_or_else(|_| panic!("failed to parse entry: {}", s)))
+        .map(|s| {
+            s.parse()
+                .unwrap_or_else(|_| panic!("failed to parse entry: {}", s))
+        })
         .collect();
     let (min_x, max_x) = report
         .iter()
@@ -89,6 +92,36 @@ pub fn num_empty_positions(s: &str, row: i64) -> usize {
                 .any(|entry| entry.is_in_range(&Position::new(x, row)))
         })
         .count()
+}
+
+// Return the tuning frequency of the distress beacon within given bound.
+pub fn distress_beacon_tuning_frequency(s: &str, bound: i64) -> i64 {
+    let report: Vec<ReportEntry> = s
+        .trim()
+        .lines()
+        .map(|s| {
+            s.parse()
+                .unwrap_or_else(|_| panic!("failed to parse entry: {}", s))
+        })
+        .collect();
+    report
+        .iter()
+        .find_map(|entry| {
+            let (min_x, max_x) = (
+                0.max(entry.sensor.x - entry.distance - 1),
+                bound.min(entry.sensor.x),
+            );
+            let (min_y, max_y) = (entry.sensor.y, bound);
+            // Courtesy: u/Sh4d1.
+            (min_x..=max_x).zip(min_y..=max_y).find_map(|(x, y)| {
+                let position = Position::new(x, y);
+                report
+                    .iter()
+                    .all(|entry| !entry.is_in_range(&position))
+                    .then_some(position.x * 4000000 + position.y)
+            })
+        })
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -113,5 +146,10 @@ Sensor at x=20, y=1: closest beacon is at x=15, y=3";
     #[test]
     fn test_num_empty_positions() {
         assert_eq!(num_empty_positions(INPUT, 10), 26);
+    }
+
+    #[test]
+    fn test_distress_beacon_tuning_frequency() {
+        assert_eq!(distress_beacon_tuning_frequency(INPUT, 20), 56000011);
     }
 }

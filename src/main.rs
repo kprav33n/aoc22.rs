@@ -43,6 +43,10 @@ fn main() {
         "day14a" => println!("{}", aoc22::day14::num_resting_sand_units_p1(&input)),
         "day14b" => println!("{}", aoc22::day14::num_resting_sand_units_p2(&input)),
         "day15a" => println!("{}", aoc22::day15::num_empty_positions(&input, 2000000)),
+        "day15b" => println!(
+            "{}",
+            aoc22::day15::distress_beacon_tuning_frequency(&input, 4000000)
+        ),
 
         _ => println!("{}: unknown command", command),
     }
