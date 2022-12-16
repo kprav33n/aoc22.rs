@@ -141,6 +141,16 @@ pub fn bench_day14(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day15(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day15.txt").unwrap();
+    c.bench_function("day15::num_empty_positions", |b| {
+        b.iter(|| aoc22::day15::num_empty_positions(&input, 2000000))
+    });
+    c.bench_function("day15::distress_beacon_tuning_frequency", |b| {
+        b.iter(|| aoc22::day15::distress_beacon_tuning_frequency(&input, 4000000))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -157,5 +167,6 @@ criterion_group!(
     bench_day12,
     bench_day13,
     bench_day14,
+    bench_day15,
 );
 criterion_main!(benches);

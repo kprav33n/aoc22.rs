@@ -1,3 +1,4 @@
+use std::fmt;
 use std::str::FromStr;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -13,6 +14,17 @@ impl Position {
 
     fn manhattan_distance(&self, other: &Position) -> i64 {
         (self.x - other.x).abs() + (self.y - other.y).abs()
+    }
+
+    fn neighbors_within(&self, distance: i64) -> Vec<Position> {
+        let mut neighbors = Vec::new();
+        for y in self.y - distance..=self.y + distance {
+            let offset = distance - (y - self.y).abs();
+            for x in self.x - offset..=self.x + offset {
+                neighbors.push(Position::new(x, y));
+            }
+        }
+        neighbors
     }
 }
 
@@ -122,6 +134,129 @@ pub fn distress_beacon_tuning_frequency(s: &str, bound: i64) -> i64 {
             })
         })
         .unwrap()
+}
+
+// For visualization only.
+#[derive(Clone, Debug)]
+enum Content {
+    Unknown,
+    Empty,
+    Sensor,
+    Beacon,
+}
+
+impl fmt::Display for Content {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            Content::Unknown => ".",
+            Content::Empty => "#",
+            Content::Sensor => "S",
+            Content::Beacon => "B",
+        })
+    }
+}
+struct Map {
+    report: Vec<ReportEntry>,
+    contents: Vec<Vec<Content>>,
+    min_x: i64,
+    min_y: i64,
+}
+
+impl fmt::Debug for Map {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for (i, row) in self.contents.iter().enumerate() {
+            if i > 0 {
+                f.write_str("\n")?;
+            }
+            for content in row {
+                f.write_str(&content.to_string())?;
+            }
+        }
+        Ok(())
+    }
+}
+
+impl Map {
+    pub fn from_report(report: Vec<ReportEntry>) -> Self {
+        let boundary = (i64::MAX, i64::MAX, i64::MIN, i64::MIN);
+        let boundary = report
+            .iter()
+            .fold(boundary, |(min_x, min_y, max_x, max_y), entry| {
+                (
+                    min_x.min(entry.sensor.x).min(entry.beacon.x),
+                    min_y.min(entry.sensor.y).min(entry.beacon.y),
+                    max_x.max(entry.sensor.x).max(entry.beacon.x),
+                    max_y.max(entry.sensor.y).max(entry.beacon.y),
+                )
+            });
+        let max_distance = report
+            .iter()
+            .map(|e| e.beacon.manhattan_distance(&e.sensor))
+            .max()
+            .unwrap();
+        let (min_x, min_y) = (boundary.0 - max_distance - 1, boundary.1 - max_distance - 1);
+        let (max_x, max_y) = (boundary.2 + max_distance + 1, boundary.3 + max_distance + 1);
+
+        let rows = (max_y - min_y) as usize;
+        let columns = (max_x - min_x) as usize;
+        let contents = vec![vec![Content::Unknown; columns]; rows];
+        let mut map = Map {
+            report,
+            contents,
+            min_x,
+            min_y,
+        };
+        map.scan();
+        map
+    }
+
+    pub fn index(&self, position: &Position) -> (usize, usize) {
+        let (column, row) = ((position.x - self.min_x), (position.y - self.min_y));
+        (row as usize, column as usize)
+    }
+
+    pub fn put(&mut self, position: &Position, content: Content) {
+        let (row, column) = self.index(position);
+        self.contents[row][column] = content;
+    }
+
+    pub fn get(&self, position: &Position) -> Content {
+        let (row, column) = self.index(position);
+        self.contents[row][column].clone()
+    }
+
+    pub fn scan(&mut self) {
+        let entries = self.report.clone();
+        for entry in &entries {
+            self.put(&entry.sensor, Content::Sensor);
+            self.put(&entry.beacon, Content::Beacon);
+        }
+
+        for entry in &entries {
+            let distance = entry.sensor.manhattan_distance(&entry.beacon);
+            let neighbors = entry.sensor.neighbors_within(distance);
+            for neighbor in neighbors {
+                if let Content::Unknown = self.get(&neighbor) {
+                    self.put(&neighbor, Content::Empty);
+                }
+            }
+        }
+    }
+}
+
+// Visualize the given input.
+#[allow(dead_code)]
+fn visualize(s: &str) {
+    let report: Vec<ReportEntry> = s
+        .trim()
+        .lines()
+        .map(|s| {
+            s.parse()
+                .unwrap_or_else(|_| panic!("failed to parse entry: {}", s))
+        })
+        .collect();
+    let map = Map::from_report(report);
+    println!("{:?}", map);
 }
 
 #[cfg(test)]
