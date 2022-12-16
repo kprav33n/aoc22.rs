@@ -6,7 +6,9 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+lazy_static = "1.4.0"
 pathfinding = "4.0.0"
+regex = "1"
 serde_json = "1.0"
 
 [dev-dependencies]

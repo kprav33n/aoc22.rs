@@ -47,6 +47,7 @@ fn main() {
             "{}",
             aoc22::day15::distress_beacon_tuning_frequency(&input, 4000000)
         ),
+        "day16a" => println!("{}", aoc22::day16::max_released_pressure(&input)),
 
         _ => println!("{}: unknown command", command),
     }
