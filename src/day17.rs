@@ -146,7 +146,7 @@ struct Chamber {
 impl fmt::Debug for Chamber {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut should_skip = true;
-        for (i, row) in self.states.iter().enumerate() {
+        for (i, row) in self.states.iter().rev().enumerate() {
             if should_skip && row.iter().all(|s| *s == CellState::Empty) {
                 continue;
             }
@@ -164,9 +164,10 @@ impl fmt::Debug for Chamber {
 }
 
 impl Chamber {
-    fn new(height: usize, width: usize) -> Chamber {
-        let states = vec![vec![CellState::Empty; width]; height];
-        let first_rock_at = states.len();
+    fn new(_height: usize, width: usize) -> Chamber {
+        let mut states = vec![vec![CellState::Empty; width]; 4000]; // FIXME: Double check
+        states[0] = vec![CellState::StoppedRock; width];
+        let first_rock_at = 0;
         Chamber {
             states,
             first_rock_at,
@@ -177,42 +178,43 @@ impl Chamber {
     fn trace_falling_rock(&mut self, rock: &Rock, position: &Position) {
         for p in rock.shape() {
             let x = position.x + p.x;
-            let y = position.y + p.y;
+            let y = position.y - p.y;
             self.states[y][x] = CellState::FallingRock;
         }
         println!("{:?}", self);
         for p in rock.shape() {
             let x = position.x + p.x;
-            let y = position.y + p.y;
+            let y = position.y - p.y;
             self.states[y][x] = CellState::Empty;
         }
     }
 
     fn can_move_down(&self, rock: &Rock, position: &Position) -> bool {
         rock.shape().iter().all(|p| {
-            let x = p.x + position.x;
-            let y = p.y + position.y + 1;
+            let x = position.x + p.x;
+            let y = position.y - p.y - 1;
             y < self.states.len() && self.states[y][x] == CellState::Empty
         })
     }
 
     fn can_move_left(&self, rock: &Rock, position: &Position) -> bool {
         rock.shape().iter().all(|p| {
-            let x = p.x + position.x - 1;
-            let y = p.y + position.y;
+            let x = position.x + p.x - 1;
+            let y = position.y - p.y;
             self.states[y][x] == CellState::Empty
         })
     }
 
     fn can_move_right(&self, rock: &Rock, position: &Position) -> bool {
         rock.shape().iter().all(|p| {
-            let x = p.x + position.x + 1;
-            let y = p.y + position.y;
+            let x = position.x + p.x + 1;
+            let y = position.y - p.y;
             self.states[y][x] == CellState::Empty
         })
     }
 
     fn execute_move(&mut self, mv: &Direction, rock: &Rock, position: &Position) -> Position {
+        // println!("Executing {:?} at position {:?}", mv, position);
         match mv {
             Direction::Left => {
                 if position.x == 0 || !self.can_move_left(rock, position) {
@@ -238,10 +240,12 @@ impl Chamber {
     fn rest_rock(&mut self, rock: &Rock, position: &Position) {
         for p in rock.shape() {
             let x = position.x + p.x;
-            let y = position.y + p.y;
+            let y = position.y - p.y;
             self.states[y][x] = CellState::StoppedRock;
-            self.first_rock_at = self.first_rock_at.min(position.y + p.y)
+            self.first_rock_at = self.first_rock_at.max(position.y - p.y)
         }
+        // println!("Rock falls 1 unit, causing it to come to rest:");
+        // println!("{:?}", self);
     }
 
     fn simulate(&mut self, moves: &[Direction]) -> Result<usize, ()> {
@@ -254,7 +258,7 @@ impl Chamber {
         ];
         let mut moves = moves.iter().cycle();
         for rock in rocks.iter().cycle().take(NUM_ROCKS) {
-            let mut position = Position::new(2, self.first_rock_at - 3 - rock.height());
+            let mut position = Position::new(2, self.first_rock_at + 3 + rock.height());
             // println!("A new rock begins falling: {:?}", rock);
             loop {
                 // self.trace_falling_rock(rock, &position);
@@ -263,16 +267,14 @@ impl Chamber {
 
                 if !self.can_move_down(rock, &position) {
                     self.rest_rock(rock, &position);
-                    // println!("Rock falls 1 unit, causing it to come to rest:");
-                    // println!("{:?}", self);
                     break;
                 }
-                position.y += 1;
+                position.y -= 1;
                 // println!("Rock falls 1 unit:");
             }
         }
         // println!("{:?}", self);
-        Ok(self.states.len() - self.first_rock_at)
+        Ok(self.first_rock_at)
     }
 }
 
