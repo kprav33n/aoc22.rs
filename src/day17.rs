@@ -5,6 +5,7 @@ const NUM_ROCK_KINDS: usize = 5;
 const TOTAL_ROCK_KINDS_HEIGHT: usize = 13;
 const HEIGHT: usize = TOTAL_ROCK_KINDS_HEIGHT / NUM_ROCK_KINDS * NUM_ROCKS;
 const WIDTH: usize = 7;
+const CUSHION: usize = 7;
 
 #[derive(Debug, Clone)]
 struct Position {
@@ -141,6 +142,7 @@ impl fmt::Display for CellState {
 struct Chamber {
     states: Vec<Vec<CellState>>,
     first_rock_at: usize,
+    last_row: usize,
 }
 
 impl fmt::Debug for Chamber {
@@ -165,13 +167,14 @@ impl fmt::Debug for Chamber {
 
 impl Chamber {
     fn new(_height: usize, width: usize) -> Chamber {
-        let mut states = vec![vec![CellState::Empty; width]; 4000]; // FIXME: Double check
-        states[0] = vec![CellState::StoppedRock; width];
-        let first_rock_at = 0;
-        Chamber {
+        let states = vec![vec![CellState::StoppedRock; width]]; // FIXME: Double check
+        let mut chamber = Chamber {
             states,
-            first_rock_at,
-        }
+            first_rock_at: 0,
+            last_row: 0,
+        };
+        chamber.allocate_rows_if_needed();
+        chamber
     }
 
     #[allow(dead_code)]
@@ -237,6 +240,16 @@ impl Chamber {
         }
     }
 
+    fn allocate_rows_if_needed(&mut self) {
+        let available = self.last_row - self.first_rock_at;
+        if available < CUSHION {
+            let needed = CUSHION - available;
+            self.states
+                .append(&mut vec![vec![CellState::Empty; WIDTH]; needed]);
+            self.last_row += needed;
+        }
+    }
+
     fn rest_rock(&mut self, rock: &Rock, position: &Position) {
         for p in rock.shape() {
             let x = position.x + p.x;
@@ -244,6 +257,7 @@ impl Chamber {
             self.states[y][x] = CellState::StoppedRock;
             self.first_rock_at = self.first_rock_at.max(position.y - p.y)
         }
+        self.allocate_rows_if_needed();
         // println!("Rock falls 1 unit, causing it to come to rest:");
         // println!("{:?}", self);
     }
