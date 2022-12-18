@@ -151,6 +151,16 @@ pub fn bench_day15(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day18(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day18.txt").unwrap();
+    c.bench_function("day18::surface_area", |b| {
+        b.iter(|| aoc22::day18::surface_area(&input))
+    });
+    c.bench_function("day18::external_surface_area", |b| {
+        b.iter(|| aoc22::day18::external_surface_area(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -168,5 +178,6 @@ criterion_group!(
     bench_day13,
     bench_day14,
     bench_day15,
+    bench_day18,
 );
 criterion_main!(benches);

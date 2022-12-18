@@ -35,6 +35,47 @@ impl Point {
         let abs = (*self - *other).abs();
         abs.x + abs.y + abs.z == 1
     }
+
+    fn neighbors(&self) -> [Point; 6] {
+        [
+            Point {
+                x: self.x - 1,
+                y: self.y,
+                z: self.z,
+            },
+            Point {
+                x: self.x + 1,
+                y: self.y,
+                z: self.z,
+            },
+            Point {
+                x: self.x,
+                y: self.y - 1,
+                z: self.z,
+            },
+            Point {
+                x: self.x,
+                y: self.y + 1,
+                z: self.z,
+            },
+            Point {
+                x: self.x,
+                y: self.y,
+                z: self.z - 1,
+            },
+            Point {
+                x: self.x,
+                y: self.y,
+                z: self.z + 1,
+            },
+        ]
+    }
+
+    fn is_within(&self, bound: i64) -> bool {
+        [self.x, self.y, self.z]
+            .iter()
+            .all(|&d| -1 <= d && d <= bound)
+    }
 }
 
 #[derive(Debug)]
@@ -89,6 +130,95 @@ pub fn surface_area(s: &str) -> usize {
     points.len() * 6 - adjacent_pairs.len() * 2
 }
 
+// FIXME: The result is off by one for example and way off for the actual input.
+// pub fn external_surface_area(s: &str) -> usize {
+//     let mut points: Vec<Point> = s
+//         .trim()
+//         .split('\n')
+//         .map(|s| {
+//             s.parse()
+//                 .unwrap_or_else(|_| panic!("failed to parse point: {}", s))
+//         })
+//         .collect();
+//     let (min_x, max_x, min_y, max_y, min_z, max_z) = points.iter().fold(
+//         (i64::MAX, i64::MIN, i64::MAX, i64::MIN, i64::MAX, i64::MIN),
+//         |(nx, xx, ny, xy, nz, xz), p| {
+//             (
+//                 p.x.min(nx),
+//                 p.x.max(xx),
+//                 p.y.min(ny),
+//                 p.y.max(xy),
+//                 p.z.min(nz),
+//                 p.z.max(xz),
+//             )
+//         },
+//     );
+//     println!("bounds: {:?}", (min_x, max_x, min_y, max_y, min_z, max_z));
+
+//     let mut adjacent_pairs: HashMap<Point, HashMap<Point, bool>> = HashMap::new();
+//     for i in 0..points.len() {
+//         for j in 0..points.len() {
+//             if i == j || !points[i].is_adjacent(&points[j]) {
+//                 continue;
+//             }
+//             adjacent_pairs
+//                 .entry(points[i])
+//                 .or_insert_with(|| HashMap::new())
+//                 .insert(points[j], true);
+//             adjacent_pairs
+//                 .entry(points[j])
+//                 .or_insert_with(|| HashMap::new())
+//                 .insert(points[i], true);
+//         }
+//     }
+
+//     points.retain(|p| {
+//         p.x == min_x || p.x == max_x || p.y == min_y || p.y == max_y || p.z == min_z || p.z == max_z
+//     });
+
+//     points
+//         .iter()
+//         .map(|p| match adjacent_pairs.get(p) {
+//             None => return 6,
+//             Some(m) => {
+//                 println!("{:?}, {:?}", p, m);
+//                 return 6 - m.len();
+//             }
+//         })
+//         .sum()
+// }
+
+pub fn external_surface_area(s: &str) -> usize {
+    let points: HashSet<Point> = s
+        .trim()
+        .lines()
+        .map(|s| {
+            s.parse()
+                .unwrap_or_else(|_| panic!("failed to parse point: {}", s))
+        })
+        .collect();
+    let bound = points
+        .iter()
+        .fold(i64::MIN, |max, p| p.x.max(p.y.max(p.z.max(max))))
+        + 1;
+    // DFS idea, courtesy: u/SuperSmurfen
+    let mut discovered: HashSet<Point> = HashSet::new();
+    let mut stack = vec![Point { x: 0, y: 0, z: 0 }];
+    while !stack.is_empty() {
+        for point in stack.pop().unwrap().neighbors() {
+            if !points.contains(&point) && !discovered.contains(&point) && point.is_within(bound) {
+                discovered.insert(point);
+                stack.push(point);
+            }
+        }
+    }
+    points
+        .iter()
+        .flat_map(|&p| p.neighbors())
+        .filter(|n| discovered.contains(n))
+        .count()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -110,5 +240,10 @@ mod tests {
     #[test]
     fn test_surface_area() {
         assert_eq!(surface_area(INPUT), 64);
+    }
+
+    #[test]
+    fn test_external_surface_area() {
+        assert_eq!(external_surface_area(INPUT), 58);
     }
 }
