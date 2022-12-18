@@ -49,6 +49,7 @@ fn main() {
         ),
         "day16a" => println!("{}", aoc22::day16::max_released_pressure(&input)),
         "day17a" => println!("{}", aoc22::day17::tower_height(&input)),
+        "day18a" => println!("{}", aoc22::day18::surface_area(&input)),
         _ => println!("{}: unknown command", command),
     }
 }
