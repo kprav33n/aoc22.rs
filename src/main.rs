@@ -51,6 +51,8 @@ fn main() {
         "day17a" => println!("{}", aoc22::day17::tower_height(&input)),
         "day18a" => println!("{}", aoc22::day18::surface_area(&input)),
         "day18b" => println!("{}", aoc22::day18::external_surface_area(&input)),
+        "day20a" => println!("{}", aoc22::day20::sum_grove_coordinates_p1(&input)),
+        "day20b" => println!("{}", aoc22::day20::sum_grove_coordinates_p2(&input)),
         _ => println!("{}: unknown command", command),
     }
 }

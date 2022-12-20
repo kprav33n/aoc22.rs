@@ -161,6 +161,16 @@ pub fn bench_day18(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day20(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day20.txt").unwrap();
+    c.bench_function("day20::sum_grove_coordinates_p1", |b| {
+        b.iter(|| aoc22::day20::sum_grove_coordinates_p1(&input))
+    });
+    c.bench_function("day20::sum_grove_coordinates_p2", |b| {
+        b.iter(|| aoc22::day20::sum_grove_coordinates_p2(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -179,5 +189,6 @@ criterion_group!(
     bench_day14,
     bench_day15,
     bench_day18,
+    bench_day20,
 );
 criterion_main!(benches);
