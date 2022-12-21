@@ -1,6 +1,9 @@
+use rsmt2::Solver;
 use std::collections::HashMap;
+use std::fmt;
 use std::str::FromStr;
 
+#[derive(Clone)]
 enum Operation {
     Multiply,
     Divide,
@@ -22,6 +25,17 @@ impl FromStr for Operation {
     }
 }
 
+impl fmt::Display for Operation {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Multiply => write!(f, "*"),
+            Self::Divide => write!(f, "/"),
+            Self::Add => write!(f, "+"),
+            Self::Subtract => write!(f, "-"),
+        }
+    }
+}
+
 impl Operation {
     fn execute(&self, left: i64, right: i64) -> i64 {
         match self {
@@ -33,6 +47,7 @@ impl Operation {
     }
 }
 
+#[derive(Clone)]
 enum Value {
     Integer(i64),
     Op(Operation, String, String),
@@ -99,11 +114,50 @@ impl JobTable {
             }
         }
     }
+
+    fn i_yell(&self) -> i64 {
+        let root: String = "root".to_string();
+        let Value::Op(_, left, right) = self.jobs[&root].value.clone() else {
+            unreachable!();
+        };
+        let equation = format!("(= {} {})", self.equation(&left), self.equation(&right));
+        let mut solver = Solver::default_z3(()).unwrap();
+        solver.declare_const("x", "Int").unwrap();
+        solver.assert(equation).unwrap();
+        assert!(solver.check_sat().unwrap());
+        let model = solver.get_model().unwrap();
+        assert!(model.len() == 1);
+        assert!(model[0].0 == "x");
+        model[0].3.parse().unwrap()
+    }
+
+    fn equation(&self, monkey: &str) -> String {
+        if monkey == "humn" {
+            return "x".to_string();
+        }
+
+        match &self.jobs[monkey].value {
+            Value::Integer(v) => v.to_string(),
+            Value::Op(operation, left, right) => {
+                format!(
+                    "({} {} {})",
+                    operation,
+                    self.equation(left),
+                    self.equation(right)
+                )
+            }
+        }
+    }
 }
 
 pub fn root_yells(s: &str) -> i64 {
     let table: JobTable = s.parse().unwrap();
     table.yells("root")
+}
+
+pub fn i_yell(s: &str) -> i64 {
+    let table: JobTable = s.parse().unwrap();
+    table.i_yell()
 }
 
 #[cfg(test)]
@@ -129,5 +183,10 @@ hmdt: 32";
     #[test]
     fn test_root_yells() {
         assert_eq!(root_yells(INPUT), 152);
+    }
+
+    #[test]
+    fn test_i_yell() {
+        assert_eq!(i_yell(INPUT), 301);
     }
 }
