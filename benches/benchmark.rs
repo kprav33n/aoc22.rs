@@ -179,6 +179,16 @@ pub fn bench_day21(c: &mut Criterion) {
     c.bench_function("day21::i_yell", |b| b.iter(|| aoc22::day21::i_yell(&input)));
 }
 
+pub fn bench_day23(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day23.txt").unwrap();
+    c.bench_function("day23::empty_ground_tiles", |b| {
+        b.iter(|| aoc22::day23::empty_ground_tiles(&input))
+    });
+    c.bench_function("day23::first_idle_round", |b| {
+        b.iter(|| aoc22::day23::first_idle_round(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -199,5 +209,6 @@ criterion_group!(
     bench_day18,
     bench_day20,
     bench_day21,
+    bench_day23,
 );
 criterion_main!(benches);

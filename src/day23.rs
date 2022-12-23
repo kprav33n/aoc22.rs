@@ -56,8 +56,7 @@ impl fmt::Debug for Map {
 }
 
 impl Map {
-    fn from_str(s: &str) -> Map {
-        let padding = 10;
+    fn from_str(s: &str, padding: usize) -> Map {
         let num_rows = s.lines().count() + 2 * padding;
         let num_cols = s.lines().next().unwrap().len() + 2 * padding;
         let mut tiles = vec![vec![Tile::Empty; num_cols]; num_rows];
@@ -129,7 +128,7 @@ impl Map {
         &mut self.tiles[pos.row as usize][pos.col as usize]
     }
 
-    fn round(&mut self, num: usize) {
+    fn round(&mut self, num: usize) -> usize {
         let mut proposals: Vec<(Position, Position)> = Vec::new();
         for (i, row) in self.tiles.iter().enumerate() {
             for (j, &tile) in row.iter().enumerate() {
@@ -160,18 +159,29 @@ impl Map {
             *dst_hist.entry(*dst).or_insert(0) += 1;
         }
 
+        let mut num_moves = 0;
         for (src, dst) in &proposals {
             if dst_hist[dst] > 1 {
                 continue;
             }
             *self.mut_tile(dst) = Tile::Elf;
             *self.mut_tile(src) = Tile::Empty;
+            num_moves += 1;
         }
+        num_moves
     }
 
     fn simulate(&mut self, count: usize) -> usize {
-        for n in 1..=count {
-            self.round(n);
+        let mut n = 1;
+        loop {
+            let num_moves = self.round(n);
+            if count == n {
+                break;
+            }
+            if num_moves == 0 {
+                return n;
+            }
+            n += 1;
         }
 
         let (min_row, min_col, max_row, max_col) = self.bounds();
@@ -204,8 +214,15 @@ impl Map {
 }
 
 pub fn empty_ground_tiles(s: &str) -> usize {
-    let mut map = Map::from_str(s);
+    // HACK: Padding was figured out based on out of bounds error.
+    let mut map = Map::from_str(s, 6);
     map.simulate(10)
+}
+
+pub fn first_idle_round(s: &str) -> usize {
+    // HACK: Padding was figured out based on out of bounds error.
+    let mut map = Map::from_str(s, 60);
+    map.simulate(usize::MAX)
 }
 
 #[cfg(test)]
@@ -223,5 +240,10 @@ mod tests {
     #[test]
     fn test_empty_ground_tiles() {
         assert_eq!(empty_ground_tiles(INPUT), 110);
+    }
+
+    #[test]
+    fn test_first_idle_round() {
+        assert_eq!(first_idle_round(INPUT), 20);
     }
 }
