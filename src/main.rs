@@ -58,6 +58,7 @@ fn main() {
         "day22a" => println!("{}", aoc22::day22::final_password(&input)),
         "day23a" => println!("{}", aoc22::day23::empty_ground_tiles(&input)),
         "day23b" => println!("{}", aoc22::day23::first_idle_round(&input)),
+        "day24a" => println!("{}", aoc22::day24::fewest_minutes_to_goal(&input)),
         _ => println!("{}: unknown command", command),
     }
 }
