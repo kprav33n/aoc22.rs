@@ -39,8 +39,3 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: clippy
-
-    - name: Run benchmarks
-      uses: actions-rs/cargo@v1
-      with:
-        command: bench
