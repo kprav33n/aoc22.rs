@@ -189,6 +189,16 @@ pub fn bench_day23(c: &mut Criterion) {
     });
 }
 
+pub fn bench_day24(c: &mut Criterion) {
+    let input = fs::read_to_string("input/day24.txt").unwrap();
+    c.bench_function("day24::fewest_minutes_to_goal_p1", |b| {
+        b.iter(|| aoc22::day24::fewest_minutes_to_goal_p1(&input))
+    });
+    c.bench_function("day24::fewest_minutes_to_goal_p2", |b| {
+        b.iter(|| aoc22::day24::fewest_minutes_to_goal_p2(&input))
+    });
+}
+
 criterion_group!(
     benches,
     bench_day01,
@@ -210,5 +220,6 @@ criterion_group!(
     bench_day20,
     bench_day21,
     bench_day23,
+    bench_day24,
 );
 criterion_main!(benches);

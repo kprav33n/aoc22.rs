@@ -79,10 +79,14 @@ impl Basin {
         }
     }
 
-    fn fewest_minutes_to_goal(&self) -> i64 {
+    fn fewest_minutes_to_goal(&self, forgot_snacks: bool) -> i64 {
         let mut minutes = 1;
-        let mut current: HashSet<Position> = HashSet::new();
-        current.insert(self.start);
+        let mut current = HashSet::from([self.start]);
+        let mut goals = if forgot_snacks {
+            vec![self.goal, self.start, self.goal]
+        } else {
+            vec![self.goal]
+        };
         loop {
             // Brute force idea courtesy: u/KeyJ
             let blizzards: HashSet<Position> = self
@@ -100,18 +104,26 @@ impl Basin {
                 .flat_map(|p| p.neighbors())
                 .filter(|p| !blizzards.contains(p) && !self.walls.contains(p))
                 .collect();
-            // println!("After {} minutes: {:?}", minutes, current);
-            if current.contains(&self.goal) {
+            if current.contains(goals.last().unwrap()) {
+                current = HashSet::from([goals.pop().unwrap()]);
+            }
+            if goals.is_empty() {
                 return minutes;
             }
+
             minutes += 1;
         }
     }
 }
 
-pub fn fewest_minutes_to_goal(s: &str) -> i64 {
+pub fn fewest_minutes_to_goal_p1(s: &str) -> i64 {
     let basin = Basin::from_str(s);
-    basin.fewest_minutes_to_goal()
+    basin.fewest_minutes_to_goal(false)
+}
+
+pub fn fewest_minutes_to_goal_p2(s: &str) -> i64 {
+    let basin = Basin::from_str(s);
+    basin.fewest_minutes_to_goal(true)
 }
 
 #[cfg(test)]
@@ -126,7 +138,12 @@ mod tests {
 ######.#";
 
     #[test]
-    fn test_fewest_minutes_to_goal() {
-        assert_eq!(fewest_minutes_to_goal(INPUT), 18);
+    fn test_fewest_minutes_to_goal_p1() {
+        assert_eq!(fewest_minutes_to_goal_p1(INPUT), 18);
+    }
+
+    #[test]
+    fn test_fewest_minutes_to_goal_p2() {
+        assert_eq!(fewest_minutes_to_goal_p2(INPUT), 54);
     }
 }
